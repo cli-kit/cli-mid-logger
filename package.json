@@ -23,7 +23,7 @@
     "logger"
   ],
   "dependencies": {
-    "cli-define": "^0.5.44",
+    "cli-define": "^0.6.4",
     "cli-logger": "^0.5.31"
   },
   "devDependencies": {
