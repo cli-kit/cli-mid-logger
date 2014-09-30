@@ -1,8 +1,7 @@
 var fs = require('fs')
   , util = require('util')
-  , define = require('cli-define').define
+  , define = require('cli-util').define
   , logger = require('cli-logger');
-  //, color = require('cli-mid-color');
 
 var defaults = {
   level: {
