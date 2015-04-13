@@ -81,8 +81,13 @@ module.exports = function(conf, options) {
   if(conf && conf.bitwise) delete conf.bitwise;
   var log = logger(conf, bitwise);
 
-  if(conf.colors !== false) {
-    var ansi = require('ttycolor').ansi;
+  var ttycolor;
+  try {
+    ttycolor = require('ttycolor');
+  }catch(e) {}
+  if(conf.colors !== false && ttycolor) {
+
+    var ansi = ttycolor.ansi;
 
     //console.log(ansi.color);
 
@@ -94,7 +99,9 @@ module.exports = function(conf, options) {
       // prefer a default prefix that styles differently
       log.conf.prefix = (conf.prefix !== undefined)
         ? conf.prefix : function(record, tty) {
-          var fmt = conf.format || '[%s]', nm = scope.name();
+          var fmt = conf.format || '%s ⚡'
+            , nm = scope.name();
+
           if(!tty) {
             return util.format(fmt, nm);
           }
@@ -102,7 +109,8 @@ module.exports = function(conf, options) {
             //'default color prefixer %s',
             //ansi(util.format(fmt, nm)).normal.bg.black);
           //return ansi(util.format(fmt, nm)).normal.bg.black;
-          var c = ansi(util.format(fmt, nm)).normal.bg.black;
+          var c = ansi(nm).normal.valueOf(tty)
+            + ansi(' ⚡').normal.cyan.valueOf(tty);
           //console.log('is instance %s', c instanceof ansi.color);
           //console.dir(c);
           return c;
@@ -110,7 +118,7 @@ module.exports = function(conf, options) {
     }
   }else{
     conf.prefix = conf.prefix !== undefined ? conf.prefix : function(record) {
-      var fmt = conf.format || '[%s]', nm = scope.name();
+      var fmt = conf.format || '%s ⚡', nm = scope.name();
       return util.format(fmt, nm);
     }
   }
