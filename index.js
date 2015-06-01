@@ -102,6 +102,7 @@ module.exports = function(conf, options) {
           var fmt = conf.format || '%s ⚡'
             , nm = scope.name();
 
+          console.log('conf prefix tty: ' + tty);
           if(!tty) {
             return util.format(fmt, nm);
           }
