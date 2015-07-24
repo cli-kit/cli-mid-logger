@@ -23,14 +23,14 @@
     "logger"
   ],
   "dependencies": {
-    "cli-logger": "~0.5.39",
+    "cli-logger": "~0.5.40",
     "cli-util": "~1.1.27"
   },
   "devDependencies": {
     "chai": "~3.2.0",
     "istanbul": "~0.3.17",
     "mocha": "~2.2.5",
-    "ttycolor": "~0.8.16"
+    "ttycolor": "~0.8.17"
   },
   "engine": [
     "node >= 0.10.21"
