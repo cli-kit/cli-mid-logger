@@ -10,7 +10,9 @@ var defaults = {
     key: 'logLevel',
     callback: function level(req, arg, value) {
       var level = parseInt(value);
-      if(!isNaN(level)) value = level;
+      if(!isNaN(level)) {
+        value = level;
+      }
       try {
         this.log.level(value);
       }catch(e) {
@@ -46,6 +48,11 @@ keys.forEach(function(key) {
 
 function configure(options) {
   var i, key;
+
+  function handler(req, arg, value) {
+    callbacks[arg.key()].call(this, req, arg, value);
+  }
+
   for(i = 0;i < keys.length;i++) {
     key = keys[i];
     if(options[key] && typeof(options[key]) === 'object'
@@ -54,9 +61,7 @@ function configure(options) {
         options[key].description = options[key].description
           || defaults[key].description;
         this.option(options[key]);
-        this.once(defaults[key].key, function(req, arg, value) {
-          callbacks[arg.key()].call(this, req, arg, value);
-        })
+        this.once(defaults[key].key, handler);
     }
   }
 }
@@ -78,7 +83,9 @@ module.exports = function(conf, options) {
 
   var scope = this;
   var bitwise = conf && conf.bitwise !== undefined ? conf.bitwise : false;
-  if(conf && conf.bitwise) delete conf.bitwise;
+  if(conf && conf.bitwise) {
+    delete conf.bitwise;
+  }
   var log = logger(conf, bitwise);
 
   var ttycolor;
@@ -97,9 +104,10 @@ module.exports = function(conf, options) {
       log.useConsoleStream();
 
       // prefer a default prefix that styles differently
-      log.conf.prefix = (conf.prefix !== undefined)
-        ? conf.prefix : function(record, tty) {
-          var fmt = conf.format || '%s ⚡'
+      log.conf.prefix = (conf.prefix !== undefined) ? conf.prefix :
+        function(record, tty) {
+          var symbol = (conf.symbol || '⚡')
+            , fmt = conf.format || '%s ' + symbol
             , nm = scope.name();
 
           if(!tty) {
@@ -109,20 +117,23 @@ module.exports = function(conf, options) {
             //'default color prefixer %s',
             //ansi(util.format(fmt, nm)).normal.bg.black);
           //return ansi(util.format(fmt, nm)).normal.bg.black;
-          var c = ansi(nm).normal.valueOf(tty)
-            + ansi(' ⚡').normal.cyan.valueOf(tty);
+          var c = ansi(nm).normal.valueOf(tty) + 
+            ansi(' ' + symbol).normal.cyan.valueOf(tty);
           //console.log('is instance %s', c instanceof ansi.color);
           //console.dir(c);
           return c;
-        }
+        };
     }
   }else{
-    conf.prefix = conf.prefix !== undefined ? conf.prefix : function(record) {
-      var fmt = conf.format || '%s ⚡', nm = scope.name();
+    conf.prefix = conf.prefix !== undefined ? conf.prefix : function(/*record*/) {
+      var fmt = conf.format || '%s ' + (conf.symbol || '⚡')
+        , nm = scope.name();
       return util.format(fmt, nm);
-    }
+    };
   }
   define(this, 'log', log, false);
-  if(options) configure.call(this, options);
+  if(options) {
+    configure.call(this, options);
+  }
   return this;
-}
+};
